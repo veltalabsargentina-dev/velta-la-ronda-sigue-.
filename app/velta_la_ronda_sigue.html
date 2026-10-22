@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VELTA - La ronda sigue (Edición Completa)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    
+    <link rel="icon" type="image/jpeg" href="https://lh3.googleusercontent.com/d/19pM4E31-1J2d6iX24uI9R3eW6wO_x6pS=s1024">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/19pM4E31-1J2d6iX24uI9R3eW6wO_x6pS=s1024">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#081C12',
+                            green: '#0F3822',
+                            lightgreen: '#1E5336',
+                            gold: '#D4AF37',
+                            goldlight: '#F3E5AB',
+                            cream: '#F7F5EE',
+                            accent: '#C84B31'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #081C12;
+            color: #F7F5EE;
+            font-family: 'Outfit', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #081C12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E5336;
+            border-radius: 10px;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4)); }
+            50% { transform: scale(1.03); filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.7)); }
+        }
+
+        @keyframes steamUp {
+            0% { transform: translateY(0) scaleX(1); opacity: 0.8; }
+            50% { transform: translateY(-12px) scaleX(1.2); opacity: 0.4; }
+            100% { transform: translateY(-25px) scaleX(1.5); opacity: 0; }
+        }
+
+        .animate-pulse-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        .steam-particle {
+            animation: steamUp 2.2s infinite ease-out;
+        }
+
+        .gold-border {
+            border: 1px solid transparent;
+            background-image: linear-gradient(#0F3822, #0F3822), linear-gradient(135deg, #D4AF37, #F3E5AB, #B38728);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF, #D4AF37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-active:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between max-w-md mx-auto relative shadow-2xl bg-brand-dark">
+
+    <!-- ================= SPLASH SCREEN ================= -->
+    <div id="splashScreen" class="fixed inset-0 z-50 bg-brand-dark flex flex-col items-center justify-center p-6 text-center transition-opacity duration-700">
+        <div class="relative mb-6">
+            <div class="w-36 h-36 rounded-3xl overflow-hidden shadow-2xl border-2 border-brand-gold/60 p-1 bg-brand-green/80 animate-pulse-glow">
+                <img src="https://lh3.googleusercontent.com/d/19pM4E31-1J2d6iX24uI9R3eW6wO_x6pS=s1024" 
+                     alt="VELTA Logo" class="w-full h-full object-cover rounded-2xl"
+                     onerror="this.src='https://placehold.co/400x400/0F3822/D4AF37?text=VELTA'">
+            </div>
+        </div>
+
+        <h1 class="text-4xl font-extrabold font-serif gold-gradient-text tracking-wider mb-2">VELTA</h1>
+        <p class="text-brand-goldlight/80 text-sm font-medium tracking-widest uppercase mb-8">La ronda sigue • Edición Pro</p>
+
+        <!-- Loading Progress Bar -->
+        <div class="w-48 h-2 bg-brand-green rounded-full overflow-hidden border border-brand-gold/30">
+            <div id="splashBar" class="h-full bg-gradient-to-r from-brand-gold to-yellow-200 w-0 transition-all duration-300"></div>
+        </div>
+        <span id="splashText" class="text-xs text-emerald-300 mt-3 font-mono">Cargando termorregulador y picada...</span>
+    </div>
+
+    <!-- ================= TOP HEADER ================= -->
+    <header class="bg-brand-green/90 backdrop-blur-md border-b border-brand-gold/20 p-4 sticky top-0 z-30 flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl overflow-hidden border border-brand-gold/40 shadow-inner">
+                <img src="https://lh3.googleusercontent.com/d/19pM4E31-1J2d6iX24uI9R3eW6wO_x6pS=s1024" 
+                     alt="Icono Velta" class="w-full h-full object-cover"
+                     onerror="this.src='https://placehold.co/100x100/0F3822/D4AF37?text=V'">
+            </div>
+            <div>
+                <h1 class="font-serif font-bold text-lg leading-tight gold-gradient-text">VELTA</h1>
+                <p class="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">Cebador Pro</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <!-- Audio Toggle -->
+            <button id="soundToggleBtn" onclick="toggleSound()" class="p-2.5 rounded-xl bg-brand-dark/60 text-brand-gold border border-brand-gold/30 hover:bg-brand-green transition btn-active">
+                <i id="soundIcon" class="fas fa-volume-up"></i>
+            </button>
+            <!-- Stats Modal Toggle -->
+            <button onclick="openStatsModal()" class="p-2.5 rounded-xl bg-brand-dark/60 text-brand-gold border border-brand-gold/30 hover:bg-brand-green transition btn-active">
+                <i class="fas fa-chart-pie"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ================= MAIN CONTENT CONTAINER ================= -->
+    <main class="flex-1 p-4 space-x-0 space-y-4 overflow-y-auto">
+
+        <!-- SETUP SECTION (Configurar Ronda) -->
+        <section id="setupSection" class="bg-brand-green/40 gold-border rounded-2xl p-5 shadow-lg space-y-4">
+            <div class="text-center">
+                <h2 class="text-xl font-bold font-serif text-brand-gold">Iniciar Nueva Ronda</h2>
+                <p class="text-xs text-emerald-200">Añadí los cebadores y tomadores de hoy</p>
+            </div>
+
+            <!-- Player Input -->
+            <div class="flex space-x-2">
+                <label for="playerNameInput" class="sr-only">Nombre del participante</label>
+                <input type="text" id="playerNameInput" placeholder="Nombre (ej. Agus, Fede, Mica)..."
+                       class="flex-1 bg-brand-dark/80 border border-brand-gold/40 rounded-xl px-4 py-2.5 text-sm text-white placeholder-emerald-600 focus:outline-none focus:border-brand-gold">
+                <button onclick="addPlayer()" class="bg-gradient-to-r from-brand-gold to-yellow-600 text-brand-dark font-bold px-4 py-2.5 rounded-xl text-sm shadow-md btn-active">
+                    <i class="fas fa-plus mr-1"></i> Sumar
+                </button>
+            </div>
+
+            <!-- Players List -->
+            <div id="setupPlayersList" class="flex flex-wrap gap-2 min-h-[50px] p-2 bg-brand-dark/40 rounded-xl border border-emerald-900/50">
+                <p id="noPlayersText" class="text-xs text-emerald-600 italic m-auto">Agregá al menos 2 personas para empezar.</p>
+            </div>
+
+            <!-- Roulette Quick Sort -->
+            <button onclick="openRouletteModal()" class="w-full bg-brand-green/80 text-brand-gold border border-brand-gold/40 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center space-x-2 btn-active">
+                <i class="fas fa-dice text-sm"></i>
+                <span>🎲 Sortear Quién Empieza (Ruleta)</span>
+            </button>
+
+            <button onclick="startRound()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold py-3.5 rounded-xl shadow-lg border border-emerald-400/30 flex items-center justify-center space-x-2 text-base btn-active">
+                <i class="fas fa-play"></i>
+                <span>¡EMPEZAR LA RONDA!</span>
+            </button>
+        </section>
+
+        <!-- ACTIVE ROUND SECTION (Oculta al inicio) -->
+        <section id="activeRoundSection" class="hidden space-y-4">
+
+            <!-- MASCOT & MAIN CEBADA CARD -->
+            <div class="bg-gradient-to-b from-brand-green/80 to-brand-dark gold-border rounded-2xl p-5 text-center relative overflow-hidden shadow-xl">
+                
+                <!-- Mascot Espumita -->
+                <div class="flex justify-center mb-2 relative">
+                    <!-- Steam animation -->
+                    <div class="absolute -top-4 flex space-x-2 text-xs text-emerald-200/50">
+                        <span class="steam-particle">░</span>
+                        <span class="steam-particle" style="animation-delay: 0.5s;">░</span>
+                        <span class="steam-particle" style="animation-delay: 1s;">░</span>
+                    </div>
+
+                    <div onclick="petEspumita()" class="w-20 h-20 bg-gradient-to-br from-emerald-700 to-emerald-900 rounded-full border-2 border-brand-gold/60 flex flex-col items-center justify-center cursor-pointer shadow-lg transform transition active:scale-95 relative group">
+                        <span class="text-2xl">🧉</span>
+                        <span class="text-[9px] font-bold text-brand-gold uppercase tracking-tighter">Espumita</span>
+                        <div id="espumitaBubble" class="absolute -top-10 bg-brand-gold text-brand-dark text-[10px] font-bold px-2 py-1 rounded-xl shadow-lg opacity-0 transition-opacity pointer-events-none w-36 text-center">
+                            ¡Rico mate! 💚
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Drinker Display -->
+                <div class="my-3">
+                    <span class="text-xs text-emerald-400 uppercase tracking-widest font-semibold">Le toca tomar a:</span>
+                    <h3 id="currentTurnName" class="text-3xl font-extrabold font-serif gold-gradient-text my-1">--</h3>
+                    <p id="nextTurnText" class="text-xs text-emerald-300/80">Siguiente: --</p>
+                </div>
+
+                <!-- Mate Cold Timer -->
+                <div class="flex items-center justify-center space-x-2 text-xs text-amber-300 bg-amber-950/40 border border-amber-500/20 py-1.5 px-3 rounded-full w-max mx-auto mb-4">
+                    <i class="fas fa-hourglass-half animate-spin" style="animation-duration: 4s;"></i>
+                    <span>Tiempo cebando: <strong id="turnTimer">00:00</strong></span>
+                </div>
+
+                <!-- PASS MATE BUTTON -->
+                <button onclick="passMate()" class="w-full bg-gradient-to-r from-brand-gold via-yellow-500 to-brand-gold text-brand-dark font-extrabold py-4 px-6 rounded-2xl shadow-xl border-2 border-yellow-200 text-lg flex items-center justify-center space-x-3 btn-active hover:brightness-110">
+                    <i class="fas fa-hand-holding-heart text-xl"></i>
+                    <span>¡PASAR MATE!</span>
+                </button>
+            </div>
+
+            <!-- ================= CONSIGNAS & PREGUNTAS MATERAS ================= -->
+            <div class="bg-brand-green/50 border border-brand-gold/30 rounded-2xl p-4 shadow-md space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-brand-gold flex items-center">
+                        <i class="fas fa-comments mr-1.5 text-amber-300"></i> Consigna de la Ronda
+                    </span>
+                    <button onclick="nextPrompt()" class="text-[10px] bg-brand-dark/60 hover:bg-brand-dark text-brand-gold px-2.5 py-1 rounded-lg border border-brand-gold/30 btn-active">
+                        <i class="fas fa-sync-alt mr-1"></i> Otra pregunta
+                    </button>
+                </div>
+                <p id="matePromptText" class="text-xs text-emerald-100 italic bg-brand-dark/40 p-2.5 rounded-xl border border-emerald-900/40 text-center">
+                    "¿Cuál fue el viaje más largo tomando mates?"
+                </p>
+            </div>
+
+            <!-- WATER & YERBA METERS CARD -->
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Water Meter -->
+                <div class="bg-brand-green/40 border border-blue-500/30 rounded-2xl p-3.5 shadow-md flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-blue-300 flex items-center">
+                            <i class="fas fa-droplet mr-1"></i> Agua (Termo)
+                        </span>
+                        <span id="waterPercent" class="text-xs font-mono text-blue-200 font-bold">100%</span>
+                    </div>
+                    <div class="w-full bg-brand-dark/80 h-3 rounded-full overflow-hidden border border-blue-900 mb-2">
+                        <div id="waterBar" class="bg-gradient-to-r from-blue-600 to-cyan-400 h-full w-full transition-all duration-500"></div>
+                    </div>
+                    <button onclick="refillWater()" class="text-[11px] bg-blue-900/50 hover:bg-blue-800/60 text-blue-200 py-1 px-2 rounded-lg border border-blue-500/30 flex items-center justify-center space-x-1 btn-active">
+                        <i class="fas fa-faucet text-[10px]"></i>
+                        <span>Recargar Agua</span>
+                    </button>
+                </div>
+
+                <!-- Yerba Meter -->
+                <div class="bg-brand-green/40 border border-emerald-500/30 rounded-2xl p-3.5 shadow-md flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-emerald-300 flex items-center">
+                            <i class="fas fa-leaf mr-1"></i> Yerba
+                        </span>
+                        <span id="yerbaPercent" class="text-xs font-mono text-emerald-200 font-bold">100%</span>
+                    </div>
+                    <div class="w-full bg-brand-dark/80 h-3 rounded-full overflow-hidden border border-emerald-900 mb-2">
+                        <div id="yerbaBar" class="bg-gradient-to-r from-emerald-600 to-green-400 h-full w-full transition-all duration-500"></div>
+                    </div>
+                    <button onclick="renewYerba()" class="text-[11px] bg-emerald-900/50 hover:bg-emerald-800/60 text-emerald-200 py-1 px-2 rounded-lg border border-emerald-500/30 flex items-center justify-center space-x-1 btn-active">
+                        <i class="fas fa-sync-alt text-[10px]"></i>
+                        <span>Cambiar Yerba</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= SALAMÍN / PICADA & EXPENSES MODULE ================= -->
+            <div class="bg-gradient-to-br from-red-950/40 via-brand-green/50 to-brand-dark border border-brand-accent/40 rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex items-center justify-between border-b border-brand-accent/30 pb-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🥓</span>
+                        <div>
+                            <h3 class="font-serif font-bold text-base text-amber-200">Picada & Gastos</h3>
+                            <p class="text-[10px] text-amber-400/80">Porciones y quién compró qué</p>
+                        </div>
+                    </div>
+
+                    <!-- Snack Type Selector -->
+                    <label for="snackTypeSelect" class="sr-only">Tipo de acompañamiento</label>
+                    <select id="snackTypeSelect" onchange="changeSnackType()" class="bg-brand-dark text-xs text-amber-300 border border-brand-accent/40 rounded-lg px-2 py-1 focus:outline-none">
+                        <option value="Salamín y Queso">🥩 Salamín y Queso</option>
+                        <option value="Bizcochitos">🥐 Bizcochitos</option>
+                        <option value="Facturas">🥐 Facturas</option>
+                        <option value="Medialunas">🥐 Medialunas</option>
+                        <option value="Chipá">🧀 Chipá</option>
+                    </select>
+                </div>
+
+                <!-- Individual Portion Counters List -->
+                <div id="snackCountersList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <!-- Dynamic player snack items injected here -->
+                </div>
+
+                <!-- Quick Stats Footer for Picada -->
+                <div class="flex justify-between items-center text-xs text-amber-300/90 pt-1 border-t border-brand-accent/20">
+                    <span>Total consumido: <strong id="totalSnackCount" class="font-mono text-white">0</strong> porciones</span>
+                    <span id="topSnackerBadge" class="bg-amber-900/60 text-amber-200 px-2 py-0.5 rounded-md border border-amber-500/30 text-[10px]">
+                        👑 Rey: --
+                    </span>
+                </div>
+            </div>
+
+            <!-- ROUND PLAYERS SUMMARY LIST -->
+            <div class="bg-brand-green/30 border border-brand-gold/20 rounded-2xl p-4 shadow-md">
+                <h4 class="text-xs font-bold text-brand-gold uppercase tracking-wider mb-2 flex justify-between">
+                    <span>Integrantes y Cebadas</span>
+                    <span id="totalMatesCount">Total: 0 mates</span>
+                </h4>
+                <div id="roundPlayersList" class="space-y-2">
+                    <!-- Dynamic player stats -->
+                </div>
+            </div>
+
+            <!-- END ROUND BUTTON -->
+            <button onclick="confirmEndRound()" class="w-full bg-red-950/60 hover:bg-red-900/80 text-red-300 border border-red-700/50 font-bold py-2.5 rounded-xl text-xs transition btn-active">
+                <i class="fas fa-flag-checkered mr-1"></i> Finalizar Esta Ronda
+            </button>
+        </section>
+
+    </main>
+
+    <!-- ================= RULETTA MODAL ================= -->
+    <div id="rouletteModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-brand-dark gold-border rounded-2xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl relative">
+            <button onclick="closeRouletteModal()" class="absolute top-3 right-3 text-emerald-400 hover:text-white">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <h3 class="font-serif text-xl font-bold gold-gradient-text">🎲 Ruleta Matera</h3>
+            <p class="text-xs text-emerald-300">¿A quién le toca empezar cebando?</p>
+
+            <div id="rouletteDisplay" class="bg-brand-green/60 border-2 border-brand-gold py-6 rounded-2xl text-2xl font-extrabold font-serif text-brand-gold animate-pulse">
+                ¡Presioná Girar!
+            </div>
+
+            <button onclick="spinRoulette()" class="w-full bg-gradient-to-r from-brand-gold to-yellow-600 text-brand-dark font-extrabold py-3 rounded-xl shadow-lg text-sm btn-active">
+                ¡GIRAR RULETA!
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= STATS & ACHIEVEMENTS MODAL ================= -->
+    <div id="statsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-brand-dark gold-border rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeStatsModal()" class="absolute top-3 right-3 text-emerald-400 hover:text-white">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+
+            <div class="text-center">
+                <h3 class="font-serif text-2xl font-bold gold-gradient-text">Estadísticas & Medallas</h3>
+                <p class="text-xs text-emerald-300">Historial acumulado de tus rondas</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-center">
+                <div class="bg-brand-green/50 p-3 rounded-xl border border-brand-gold/30">
+                    <span class="text-2xl font-bold font-mono gold-gradient-text" id="statTotalMates">0</span>
+                    <p class="text-[10px] text-emerald-200 uppercase mt-1">Mates Cebados</p>
+                </div>
+                <div class="bg-brand-green/50 p-3 rounded-xl border border-brand-gold/30">
+                    <span class="text-2xl font-bold font-mono gold-gradient-text" id="statTotalRounds">0</span>
+                    <p class="text-[10px] text-emerald-200 uppercase mt-1">Rondas Jugadas</p>
+                </div>
+            </div>
+
+            <div class="bg-brand-green/30 p-3 rounded-xl border border-brand-accent/30 text-center">
+                <span class="text-xs text-amber-300 block font-semibold mb-1">👑 Rey de la Picada Histórico</span>
+                <p id="statKingSnack" class="text-lg font-bold font-serif text-amber-200">--</p>
+            </div>
+
+            <!-- Achievements Section -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-bold text-brand-gold uppercase tracking-wider text-center">🏆 Medallas Desbloqueadas</h4>
+                <div id="achievementsList" class="grid grid-cols-1 gap-2">
+                    <!-- Dynamic badges -->
+                </div>
+            </div>
+
+            <button onclick="closeStatsModal()" class="w-full bg-brand-green text-brand-gold border border-brand-gold/40 py-2.5 rounded-xl font-bold text-sm btn-active">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- AUDIO SYNTHESIS & LOGIC SCRIPT -->
+    <script>
+        /* ================= STATE MANAGEMENT ================= */
+        let players = [];
+        let currentTurnIndex = 0;
+        let waterLevel = 100;
+        let yerbaLevel = 100;
+        let totalMatesRound = 0;
+        let currentSnackType = 'Salamín y Queso';
+        let isSoundEnabled = true;
+        let turnStartTime = null;
+        let timerInterval = null;
+
+        // Cumulative Stats in LocalStorage
+        let globalStats = JSON.parse(localStorage.getItem('velta_global_stats')) || {
+            totalMates: 0,
+            totalRounds: 0,
+            snackLeaderboard: {},
+            unlockedAchievements: []
+        };
+
+        const matePrompts = [
+            "¿Cuál fue el viaje más largo tomando mates?",
+            "Si tuvieras que elegir una sola variedad de yerba para toda la vida, ¿cuál sería?",
+            "¿Mate dulce, amargo, con yuyos o con café?",
+            "¿Quién es el peor cebador del grupo (sin pelearse)?",
+            "Contá una anécdota bizarra tomando mates en la vía pública.",
+            "¿Bizcochitos de grasa o de manteca? Defende tu postura.",
+            "Si pudieras tomar mates con cualquier famoso/a vivo o muerto, ¿con quién sería?",
+            "¿Qué es lo más raro que le pusiste o viste que le pongan al mate?"
+        ];
+
+        /* ================= WEB AUDIO SYNTHESIZER ================= */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!isSoundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'pass') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'snack') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.setValueAtTime(220, now + 0.05);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'bubble') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'refill') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(250, now);
+                osc.frequency.linearRampToValueAtTime(500, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            }
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            const icon = document.getElementById('soundIcon');
+            icon.className = isSoundEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute text-red-400';
+        }
+
+        /* ================= SPLASH SCREEN ================= */
+        window.onload = function() {
+            const bar = document.getElementById('splashBar');
+            const splash = document.getElementById('splashScreen');
+            
+            setTimeout(() => bar.style.width = '40%', 100);
+            setTimeout(() => bar.style.width = '80%', 400);
+            setTimeout(() => {
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 700);
+                }, 300);
+            }, 800);
+
+            ['Agus', 'Fede', 'Mica'].forEach(name => {
+                players.push({ name: name, mates: 0, snacks: 0 });
+            });
+            renderSetupPlayers();
+            nextPrompt();
+        };
+
+        /* ================= SETUP LOGIC ================= */
+        function addPlayer() {
+            const input = document.getElementById('playerNameInput');
+            const name = input.value.trim();
+            if (name === '') return;
+
+            players.push({ name: name, mates: 0, snacks: 0 });
+            input.value = '';
+            renderSetupPlayers();
+        }
+
+        function removePlayer(index) {
+            players.splice(index, 1);
+            renderSetupPlayers();
+        }
+
+        function renderSetupPlayers() {
+            const container = document.getElementById('setupPlayersList');
+            if (players.length === 0) {
+                container.innerHTML = `<p id="noPlayersText" class="text-xs text-emerald-600 italic m-auto">Agregá al menos 2 personas para empezar.</p>`;
+                return;
+            }
+
+            container.innerHTML = players.map((p, idx) => `
+                <span class="bg-brand-green/80 text-emerald-200 border border-brand-gold/30 text-xs px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-sm">
+                    <i class="fas fa-user-circle text-brand-gold"></i>
+                    <span>${p.name}</span>
+                    <button onclick="removePlayer(${idx})" class="text-red-400 hover:text-red-200 ml-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </span>
+            `).join('');
+        }
+
+        /* ================= ROULETTE (SORTEO) ================= */
+        function openRouletteModal() {
+            if (players.length < 2) {
+                alert('¡Agregá al menos 2 jugadores en la lista para usar la ruleta!');
+                return;
+            }
+            document.getElementById('rouletteDisplay').innerText = '¡Preparados...';
+            document.getElementById('rouletteModal').classList.remove('hidden');
+        }
+
+        function closeRouletteModal() {
+            document.getElementById('rouletteModal').classList.add('hidden');
+        }
+
+        function spinRoulette() {
+            playSound('bubble');
+            let counter = 0;
+            const display = document.getElementById('rouletteDisplay');
+            const interval = setInterval(() => {
+                const randomPlayer = players[Math.floor(Math.random() * players.length)];
+                display.innerText = randomPlayer.name;
+                counter++;
+                if (counter > 15) {
+                    clearInterval(interval);
+                    const winner = players[Math.floor(Math.random() * players.length)];
+                    display.innerText = `🎉 ¡Empieza ${winner.name}!`;
+                    playSound('refill');
+                }
+            }, 100);
+        }
+
+        function startRound() {
+            if (players.length < 2) {
+                alert('¡Para armar una buena ronda hace falta al menos 2 personas!');
+                return;
+            }
+
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('activeRoundSection').classList.remove('hidden');
+
+            currentTurnIndex = 0;
+            totalMatesRound = 0;
+            waterLevel = 100;
+            yerbaLevel = 100;
+
+            updateMeters();
+            updateTurnDisplay();
+            renderSnackCounters();
+            renderRoundPlayers();
+            startTurnTimer();
+            playSound('refill');
+        }
+
+        /* ================= ACTIVE ROUND ================= */
+        function passMate() {
+            playSound('pass');
+            players[currentTurnIndex].mates += 1;
+            totalMatesRound += 1;
+
+            waterLevel = Math.max(0, waterLevel - 8);
+            yerbaLevel = Math.max(0, yerbaLevel - 4);
+            updateMeters();
+
+            currentTurnIndex = (currentTurnIndex + 1) % players.length;
+            updateTurnDisplay();
+            renderRoundPlayers();
+            startTurnTimer();
+        }
+
+        function updateTurnDisplay() {
+            const current = players[currentTurnIndex];
+            const next = players[(currentTurnIndex + 1) % players.length];
+
+            document.getElementById('currentTurnName').innerText = current.name;
+            document.getElementById('nextTurnText').innerText = `Siguiente: ${next.name}`;
+        }
+
+        function nextPrompt() {
+            const prompt = matePrompts[Math.floor(Math.random() * matePrompts.length)];
+            document.getElementById('matePromptText').innerText = `"${prompt}"`;
+        }
+
+        function startTurnTimer() {
+            clearInterval(timerInterval);
+            turnStartTime = Date.now();
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - turnStartTime) / 1000);
+                const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const secs = String(elapsed % 60).padStart(2, '0');
+                document.getElementById('turnTimer').innerText = `${mins}:${secs}`;
+
+                // Espumita intelligent warning if mate takes too long (> 45s)
+                if (elapsed === 45) {
+                    showEspumitaWarning("¡Se enfría el mate che! 🧊");
+                }
+            }, 1000);
+        }
+
+        function updateMeters() {
+            document.getElementById('waterBar').style.width = `${waterLevel}%`;
+            document.getElementById('waterPercent').innerText = `${waterLevel}%`;
+
+            document.getElementById('yerbaBar').style.width = `${yerbaLevel}%`;
+            document.getElementById('yerbaPercent').innerText = `${yerbaLevel}%`;
+        }
+
+        function refillWater() {
+            waterLevel = 100;
+            updateMeters();
+            playSound('refill');
+            showEspumitaWarning("¡Termo recargado! 💧");
+        }
+
+        function renewYerba() {
+            yerbaLevel = 100;
+            updateMeters();
+            playSound('refill');
+            showEspumitaWarning("¡Yerba nueva, qué aroma! 🌱");
+        }
+
+        function petEspumita() {
+            playSound('bubble');
+            showEspumitaWarning("¡Rico mate! 💚");
+        }
+
+        function showEspumitaWarning(text) {
+            const bubble = document.getElementById('espumitaBubble');
+            bubble.innerText = text;
+            bubble.style.opacity = '1';
+            setTimeout(() => bubble.style.opacity = '0', 2000);
+        }
+
+        /* ================= PICADA & SNACKS ================= */
+        function changeSnackType() {
+            currentSnackType = document.getElementById('snackTypeSelect').value;
+            renderSnackCounters();
+        }
+
+        function adjustSnack(playerIndex, delta) {
+            playSound('snack');
+            players[playerIndex].snacks = Math.max(0, players[playerIndex].snacks + delta);
+            renderSnackCounters();
+        }
+
+        function renderSnackCounters() {
+            const container = document.getElementById('snackCountersList');
+            let totalSnacks = 0;
+            let topSnacker = null;
+            let maxSnacks = -1;
+
+            container.innerHTML = players.map((p, idx) => {
+                totalSnacks += p.snacks;
+                if (p.snacks > maxSnacks && p.snacks > 0) {
+                    maxSnacks = p.snacks;
+                    topSnacker = p.name;
+                }
+
+                return `
+                    <div class="flex items-center justify-between bg-brand-dark/70 border border-brand-accent/30 rounded-xl px-3 py-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-semibold text-amber-100">${p.name}</span>
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <button onclick="adjustSnack(${idx}, -1)" class="w-7 h-7 bg-red-950/80 text-red-300 rounded-lg border border-red-700/50 flex items-center justify-center font-bold text-xs btn-active">
+                                -
+                            </button>
+                            <span class="font-mono text-sm font-bold text-amber-300 w-6 text-center">${p.snacks}</span>
+                            <button onclick="adjustSnack(${idx}, 1)" class="w-7 h-7 bg-amber-700/60 text-amber-100 rounded-lg border border-amber-500/50 flex items-center justify-center font-bold text-xs btn-active">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('totalSnackCount').innerText = totalSnacks;
+            document.getElementById('topSnackerBadge').innerText = topSnacker ? `👑 Rey: ${topSnacker} (${maxSnacks})` : '👑 Rey: --';
+        }
+
+        function renderRoundPlayers() {
+            const container = document.getElementById('roundPlayersList');
+            document.getElementById('totalMatesCount').innerText = `Total: ${totalMatesRound} mates`;
+
+            container.innerHTML = players.map((p, idx) => `
+                <div class="flex items-center justify-between text-xs py-1.5 px-3 rounded-lg ${idx === currentTurnIndex ? 'bg-brand-gold/20 border border-brand-gold/40' : 'bg-brand-dark/40'}">
+                    <span class="font-medium text-emerald-100 flex items-center">
+                        ${idx === currentTurnIndex ? '👉 ' : ''}${p.name}
+                    </span>
+                    <span class="font-mono text-brand-gold font-bold">${p.mates} mates</span>
+                </div>
+            `).join('');
+        }
+
+        /* ================= END ROUND & ACHIEVEMENTS ================= */
+        function confirmEndRound() {
+            if (!confirm('¿Seguro que quieren finalizar la ronda actual?')) return;
+
+            globalStats.totalMates += totalMatesRound;
+            globalStats.totalRounds += 1;
+
+            let topSnacker = null;
+            let maxSnacks = 0;
+            players.forEach(p => {
+                if (p.snacks > maxSnacks) {
+                    maxSnacks = p.snacks;
+                    topSnacker = p.name;
+                }
+            });
+
+            if (topSnacker) {
+                globalStats.snackLeaderboard[topSnacker] = (globalStats.snackLeaderboard[topSnacker] || 0) + maxSnacks;
+            }
+
+            checkAchievements();
+            localStorage.setItem('velta_global_stats', JSON.stringify(globalStats));
+
+            clearInterval(timerInterval);
+            document.getElementById('activeRoundSection').classList.add('hidden');
+            document.getElementById('setupSection').classList.remove('hidden');
+
+            openStatsModal();
+        }
+
+        function checkAchievements() {
+            const ach = globalStats.unlockedAchievements;
+            if (globalStats.totalMates >= 20 && !ach.includes('olympic')) ach.push('olympic');
+            if (globalStats.totalRounds >= 5 && !ach.includes('veteran')) ach.push('veteran');
+            if (totalMatesRound >= 15 && !ach.includes('heavy')) ach.push('heavy');
+        }
+
+        function openStatsModal() {
+            document.getElementById('statTotalMates').innerText = globalStats.totalMates;
+            document.getElementById('statTotalRounds').innerText = globalStats.totalRounds;
+
+            let bestKing = '--';
+            let maxGlobal = 0;
+            for (const [name, count] of Object.entries(globalStats.snackLeaderboard)) {
+                if (count > maxGlobal) {
+                    maxGlobal = count;
+                    bestKing = `${name} (${count} porciones)`;
+                }
+            }
+            document.getElementById('statKingSnack').innerText = bestKing;
+
+            // Render Achievements
+            const achContainer = document.getElementById('achievementsList');
+            const unlocked = globalStats.unlockedAchievements;
+
+            const badges = [
+                { id: 'olympic', icon: '🧉', title: 'Cebador Olímpico', desc: 'Acumulá 20+ mates cebados' },
+                { id: 'veteran', icon: '⭐', title: 'Maestro de la Ronda', desc: 'Jugá 5+ rondas totales' },
+                { id: 'heavy', icon: '⚡', title: 'Maratón Matera', desc: 'Hacé 15+ mates en una ronda' }
+            ];
+
+            achContainer.innerHTML = badges.map(b => {
+                const isUnlocked = unlocked.includes(b.id);
+                return `
+                    <div class="flex items-center space-x-3 p-2.5 rounded-xl border ${isUnlocked ? 'bg-brand-green/70 border-brand-gold/40 text-brand-gold' : 'bg-brand-dark/40 border-emerald-900/30 text-emerald-600 opacity-50'}">
+                        <span class="text-xl">${b.icon}</span>
+                        <div>
+                            <h5 class="text-xs font-bold ${isUnlocked ? 'text-amber-200' : 'text-emerald-500'}">${b.title}</h5>
+                            <p class="text-[10px] text-emerald-300/80">${b.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+
+        function closeStatsModal() {
+            document.getElementById('statsModal').classList.add('hidden');
+            // Reset round stats and player counters back to initial state
+            totalMatesRound = 0;
+            players.forEach(p => {
+                p.mates = 0;
+                p.snacks = 0;
+            });
+            renderSetupPlayers();
+        }
+    </script>
+</body>
+</html>
